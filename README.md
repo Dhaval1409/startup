@@ -1,0 +1,2 @@
+# startup
+love is etalnal
