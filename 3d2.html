@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Scroll-Controlled Video Love Story</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            height: 400vh;
+            background: #000;
+          font-family: cursive;
+            overflow-x: hidden;
+        }
+
+        video {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            object-fit: cover;
+
+        }
+
+        section {
+            height: 100vh;
+            /* Each message takes full screen scroll */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .message {
+            position: relative;
+            width: 80vw;
+            max-width: 350px;
+            font-size: 3.3rem;
+            font-weight: 600;
+            color: #f4f4f4;
+            text-shadow: 0 0 8px #ff4c6dcc;
+            opacity: 0;
+            transform: translateX(100vw);
+            transition: all 1s ease;
+            pointer-events: none;
+            text-align: center;
+        }
+
+        .message.from-left {
+            transform: translateX(-100vw);
+        }
+
+        .message.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        .a{
+            z-index: 99;
+        }
+    </style>
+    
+</head>
+
+<body>
+
+    <!-- 🎥 Fullscreen Scroll-Controlled Video -->
+    <video id="scroll-video" src="yourname.mp4" muted playsinline preload="auto"></video>
+
+    <!-- 📜 Scroll Sections -->
+    <section>
+        <div id="message1" class="message from-left">
+            <p>Every scroll reveals a memory of us...</p>
+             
+        </div>
+    </section>
+
+    <section>
+        <div id="message2" class="message">
+            <p>Love moves with every swipe.</p>
+         
+        
+        </div>
+    </section>
+
+    <section>
+        <div id="message3" class="message from-left">
+            <p>This is how I feel every moment with you.</p>
+           
+        </div>
+          
+    </section>
+
+    <script>
+        const video = document.getElementById('scroll-video');
+        let duration = 0;
+
+        // Pause the video as soon as metadata is loaded
+        video.addEventListener('loadedmetadata', () => {
+            duration = video.duration;
+            video.pause(); // prevent autoplay
+        });
+
+        // Scroll event
+        window.addEventListener('scroll', () => {
+            const scrollTop = window.scrollY;
+            const maxScroll = document.body.scrollHeight - window.innerHeight;
+            const scrollFraction = scrollTop / maxScroll;
+
+            // Scroll-synced video time
+            if (!isNaN(duration)) {
+                video.currentTime = duration * scrollFraction;
+            }
+
+            handleMessages(scrollTop);
+        });
+
+        function handleMessages(scrollTop) {
+            const vh = window.innerHeight;
+
+            const messages = [
+                { id: 'message1', showAt: vh * 0.2, hideAt: vh * 1 },
+                { id: 'message2', showAt: vh * 1.2, hideAt: vh * 2 },
+                { id: 'message3', showAt: vh * 2.2, hideAt: vh * 3 },
+                 { id: 'message4', showAt: vh * 2.4, hideAt: vh * 4},
+            ];
+
+            messages.forEach(({ id, showAt, hideAt }) => {
+                const el = document.getElementById(id);
+                if (scrollTop >= showAt && scrollTop < hideAt) {
+                    el.classList.add('visible');
+                } else {
+                    el.classList.remove('visible');
+                }
+            });
+        }
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Paper Wrapped Love Card</title>
+<style>
+  body {
+    margin: 0;
+    height: 100vh;
+    background: #fff0f5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .card-wrapper {
+    width: 320px;
+    height: 220px;
+    position: relative;
+    perspective: 1200px;
+    cursor: pointer;
+  }
+
+  .paper {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #fff9f7 0%, #f7e9e7 100%);
+    box-shadow:
+      inset 0 1px 3px rgba(255,255,255,0.9),
+      0 10px 20px rgba(0,0,0,0.15);
+    border-radius: 12px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .fold-left,
+  .fold-right {
+    position: absolute;
+    top: 0;
+    width: 30px;
+    height: 100%;
+    background: linear-gradient(to right, #f3d7d6, #cfa7a5);
+    box-shadow: inset 0 0 12px rgba(0,0,0,0.15);
+    pointer-events: none;
+    z-index: 3;
+  }
+  .fold-left {
+    left: 0;
+    border-radius: 12px 0 0 12px;
+    background: linear-gradient(to left, #f3d7d6, #cfa7a5);
+    filter: drop-shadow(1px 0 1px rgba(0,0,0,0.1));
+  }
+  .fold-right {
+    right: 0;
+    border-radius: 0 12px 12px 0;
+  }
+
+  .fold-shadow-left {
+    position: absolute;
+    top: 0; left: 0;
+    width: 40px;
+    height: 100%;
+    background: linear-gradient(to right, rgba(0,0,0,0.07), transparent);
+    pointer-events: none;
+    border-radius: 12px 0 0 12px;
+    z-index: 2;
+  }
+  .fold-shadow-right {
+    position: absolute;
+    top: 0; right: 0;
+    width: 40px;
+    height: 100%;
+    background: linear-gradient(to left, rgba(0,0,0,0.07), transparent);
+    pointer-events: none;
+    border-radius: 0 12px 12px 0;
+    z-index: 2;
+  }
+
+  .flap {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    background: linear-gradient(135deg, #d8605f, #b13f3f);
+    border-radius: 12px 12px 0 0;
+    box-shadow:
+      inset 0 3px 8px rgba(255,255,255,0.3),
+      0 4px 8px rgba(0,0,0,0.15);
+    transform-origin: top center;
+    transform-style: preserve-3d;
+    transition: transform 1s ease;
+    z-index: 10;
+    overflow: visible;
+  }
+  .flap::after {
+    content: '';
+    position: absolute;
+    bottom: -15px;
+    left: 50%;
+    width: 140px;
+    height: 40px;
+    background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.3), transparent 70%);
+    border-radius: 50%;
+    transform: translateX(-50%) rotate(5deg);
+    filter: drop-shadow(0 3px 3px rgba(0,0,0,0.1));
+    pointer-events: none;
+  }
+
+  .ribbon-vertical,
+  .ribbon-horizontal {
+    position: absolute;
+    background: linear-gradient(135deg, #ff6161, #b71c1c);
+    box-shadow:
+      inset 0 0 8px rgba(255, 255, 255, 0.7),
+      0 2px 6px rgba(0, 0, 0, 0.3);
+    z-index: 15;
+    border-radius: 4px;
+    pointer-events: none;
+  }
+  .ribbon-vertical {
+    width: 24px;
+    height: 100%;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    filter: drop-shadow(0 0 4px rgba(255, 99, 99, 0.8));
+  }
+  .ribbon-horizontal {
+    width: 100%;
+    height: 24px;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    filter: drop-shadow(0 0 4px rgba(255, 99, 99, 0.8));
+  }
+
+  .ribbon-bow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 56px;
+    height: 56px;
+    background:
+      radial-gradient(circle at 35% 35%, #ff4d4d, #b71c1c 80%);
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    box-shadow:
+      0 0 15px rgba(255, 77, 77, 0.8),
+      inset 0 0 12px rgba(255, 255, 255, 0.6);
+    transform: translate(-50%, -50%) rotate(15deg);
+    z-index: 20;
+    filter: drop-shadow(0 2px 2px rgba(0,0,0,0.15));
+  }
+
+  .message {
+    position: absolute;
+    top: 60px;
+    left: 20px;
+    right: 20px;
+    bottom: 20px;
+    background: #fffef9;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    padding: 25px 20px;
+    opacity: 0;
+    transition: opacity 0.7s ease 0.5s, bottom 0.7s ease 0.7s, top 0.7s ease 0.7s;
+    overflow: hidden;
+    font-size: 16px;
+    color: #444;
+    user-select: none;
+    z-index: 5;
+  }
+  .message h2 {
+    color: #b71c1c;
+    margin-bottom: 10px;
+  }
+
+  .card-wrapper.open .flap {
+    transform: rotateX(-120deg);
+  }
+  .card-wrapper.open .message {
+    opacity: 1;
+  }
+
+  /* When wrapper removed, expand message to almost full card */
+  .card-wrapper.removed .message {
+    top: 10px;
+    bottom: 10px;
+    opacity: 1;
+  }
+  /* Hide box parts when removed */
+  .card-wrapper.removed .flap,
+  .card-wrapper.removed .ribbon-bow,
+  .card-wrapper.removed .ribbon-horizontal,
+  .card-wrapper.removed .ribbon-vertical,
+  .card-wrapper.removed .fold-left,
+  .card-wrapper.removed .fold-right,
+  .card-wrapper.removed .fold-shadow-left,
+  .card-wrapper.removed .fold-shadow-right {
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+
+  #nextBtn {
+    display: none;
+    padding: 10px 25px;
+    background: #b71c1c;
+    border: none;
+    border-radius: 25px;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(183, 28, 28, 0.7);
+    transition: background 0.3s ease;
+    user-select: none;
+    margin-top: 15px;
+  }
+  #nextBtn:hover {
+    background: #7a0e0e;
+  }
+
+  /* Hearts container */
+  .hearts-container {
+    pointer-events: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: visible;
+    z-index: 100;
+  }
+  .heart {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: #e91e63;
+    transform: rotate(-45deg);
+    opacity: 0.8;
+    animation: floatUp 4s forwards;
+    filter: drop-shadow(0 0 2px #e91e63);
+    border-radius: 5px 5px 0 0;
+  }
+  .heart::before,
+  .heart::after {
+    content: "";
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: #e91e63;
+    border-radius: 50%;
+  }
+  .heart::before {
+    top: -10px;
+    left: 0;
+  }
+  .heart::after {
+    top: 0;
+    left: 10px;
+  }
+  @keyframes floatUp {
+    0% {
+      transform: translateY(0) rotate(-45deg);
+      opacity: 0.8;
+    }
+    100% {
+      transform: translateY(-200px) translateX(30px) rotate(-45deg);
+      opacity: 0;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="card-wrapper" id="cardWrapper" aria-label="Wrapped love card" role="button" tabindex="0">
+  <div class="paper">
+    <div class="fold-left"></div>
+    <div class="fold-right"></div>
+    <div class="fold-shadow-left"></div>
+    <div class="fold-shadow-right"></div>
+
+    <div class="flap"></div>
+
+    <div class="ribbon-vertical"></div>
+    <div class="ribbon-horizontal"></div>
+    <div class="ribbon-bow"></div>
+
+    <div class="message">
+      <h2>💖 My Heart’s Message</h2>
+      <p>
+
+        Forever yours, wrapped with love and dreams.
+      </p>
+    </div>
+  </div>
+</div>
+
+<a  id="nextBtn" href="page2.html">click me 💖</a>
+
+<div class="hearts-container" id="heartsContainer"></div>
+
+<script>
+  const cardWrapper = document.getElementById('cardWrapper');
+  const heartsContainer = document.getElementById('heartsContainer');
+  const nextBtn = document.getElementById('nextBtn');
+
+  let opened = false;
+  let confettiInterval;
+
+  function createHeart() {
+    const heart = document.createElement('div');
+    heart.classList.add('heart');
+    heart.style.left = Math.random() * window.innerWidth + 'px';
+    heart.style.top = window.innerHeight + 20 + 'px';
+    heart.style.animationDuration = (3 + Math.random() * 2) + 's';
+    heartsContainer.appendChild(heart);
+    setTimeout(() => heart.remove(), 4000);
+  }
+
+  cardWrapper.addEventListener('click', () => {
+    if (!opened) {
+      opened = true;
+      cardWrapper.classList.add('open');
+      nextBtn.style.display = 'inline-block';
+
+      confettiInterval = setInterval(createHeart, 300);
+      setTimeout(() => clearInterval(confettiInterval), 10000);
+
+      setTimeout(() => {
+        cardWrapper.classList.add('removed');
+      }, 1000);
+    }
+  });
+
+  nextBtn.addEventListener('click', () => {
+    alert('Next surprise coming soon! 🎉');
+  });
+
+  cardWrapper.addEventListener('keydown', (e) => {
+    if ((e.key === 'Enter' || e.key === ' ') && !opened) {
+      e.preventDefault();
+      cardWrapper.click();
+    }
+  });
+</script>
+
+</body>
+</html>
